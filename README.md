@@ -3,25 +3,20 @@ A demo application with Springboot and Oracle DB using Oracle UCP as Connection 
 
 # Getting Started
 
-### Reference Documentation
-For further reference, please consider the following sections:
+Ensure you have an Oracle 19c DB instance up running before you run the Springboot application. If you prefer running a docker image locally of the Oracle Database, refer to the 'Setting up Oracle DB using Docker image' section below. 
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/3.0.0/maven-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/3.0.0/maven-plugin/reference/html/#build-image)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#web)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#using.devtools)
-* [Validation](https://docs.spring.io/spring-boot/docs/3.0.0/reference/htmlsingle/#io.validation)
+Ensure the spring.profiles.active property in application.properties is set to 'dev' (if its 'local', then it will run an in-memory H2 DB). This will load the configuration in application-dev.properties, which has details to connect to the Oracle Database. 
 
-### Guides
-The following guides illustrate how to use some features concretely:
+Ensure you provide the right username and password for the DB connection. And that there is a table, based on the Java model, present in the DB. Refer to the end of this document for the DB schema.
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Validation](https://spring.io/guides/gs/validating-form-input/)
+Start the spring applicaiton by entering the root directory (/springboot-oracle) and running the following command:
+```
+mvn spring-boot:run
+```
 
-Before you begin
+The API is running on http://localhost:8080/data-app/individuals
+
+Setting up Oracle DB using Docker image
 ----------------
 
 1. Clone `https://github.com/oracle/docker-images`.
