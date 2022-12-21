@@ -13,8 +13,10 @@ ls -lt
 
     stage('Verify Artifact exists') {
       steps {
-        dir(path: 'target')
-        fileExists 'getIndividualData-0.0.1-SNAPSHOT.jar'
+        dir(path: 'target') {
+          fileExists 'getIndividualData-0.0.1-SNAPSHOT.jar'
+        }
+
       }
     }
 
