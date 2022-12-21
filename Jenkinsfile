@@ -13,12 +13,8 @@ ls -lt
 
     stage('Verify Artifact exists') {
       steps {
-        sh 'pwd'
-        sh 'ls -lt'
-        dir(path: 'target') {
-          sh 'ls -lt'
-        }
-
+        dir(path: 'target')
+        fileExists 'getIndividualData-0.0.1-SNAPSHOT.jar'
       }
     }
 
