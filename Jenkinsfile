@@ -6,9 +6,6 @@ pipeline {
         sh '''#List directories
 ls -lt
 '''
-        sh '''#Java version
-java --version
-which java'''
         sh 'mvn clean'
         sh 'mvn package'
       }
