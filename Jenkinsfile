@@ -1,10 +1,13 @@
 pipeline {
   agent any
   stages {
-    stage('List directories') {
+    stage('Build Artefact') {
       steps {
-        sh '''ls -lt
+        sh '''#List directories
+ls -lt
 '''
+        sh 'mvn clean'
+        sh 'mvn package'
       }
     }
 
