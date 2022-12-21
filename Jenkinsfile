@@ -11,6 +11,16 @@ ls -lt
       }
     }
 
+    stage('Verify Artifact exists') {
+      steps {
+        pwd(tmp: true)
+        dir(path: '/target') {
+          sh 'ls -lt'
+        }
+
+      }
+    }
+
   }
   tools {
     maven 'Maven 3.8.6'
