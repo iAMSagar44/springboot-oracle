@@ -15,6 +15,10 @@ ls -lt
       steps {
         sh 'pwd'
         sh 'ls -lt'
+        dir(path: 'target') {
+          sh 'ls -lt'
+        }
+
       }
     }
 
