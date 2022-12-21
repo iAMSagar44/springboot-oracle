@@ -13,11 +13,8 @@ ls -lt
 
     stage('Verify Artifact exists') {
       steps {
-        pwd(tmp: true)
-        dir(path: '/target') {
-          sh 'ls -lt'
-        }
-
+        sh 'pwd'
+        sh 'ls -lt'
       }
     }
 
