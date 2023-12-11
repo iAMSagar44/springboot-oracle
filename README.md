@@ -1,88 +1,88 @@
-# Springboot application integration with Oracle Database 19c
-A demo application with Springboot and Oracle DB using Oracle UCP as Connection Pool.
+# Spring Boot application integration with Oracle Database 23c
+A demo application with Spring Boot and Oracle DB using Oracle UCP as Connection Pool.
 
 # Getting Started
 
-Ensure you have an Oracle 19c DB instance up running before you run the Springboot application. If you prefer running a docker image locally of the Oracle Database, refer to the 'Setting up Oracle DB using Docker image' section below. 
+To get started head over to start.spring.io and create the following project:
 
-Ensure the spring.profiles.active property in application.properties is set to 'dev' (if its 'local', then it will run an in-memory H2 DB). This will load the configuration in application-dev.properties, which has details to connect to the Oracle Database. 
+- Maven
+- Spring Boot 3.2
+- Java 17
+- Dependencies
+    - Web
+    - Spring Data JPA
+    - Oracle 
+    - Spring Boot DevTools
+    - Validation
+    - H2 (optional, for local testing)
 
-Ensure you provide the right username and password for the DB connection. And that there is a table, based on the Java model, present in the DB. Refer to the end of this document for the DB schema.
+Ensure you have an Oracle 23c DB instance up and running before you run the Spring Boot application. If you prefer running a docker image locally of the Oracle Database, refer to the 'Installing Oracle Database 23c for free using Docker image' section below. 
 
-Start the spring applicaiton by entering the root directory (/springboot-oracle) and running the following command:
+If you are cloning this project, then ensure the spring.profiles.active property in application.properties is set to 'dev' (if its 'local', then it will run an in-memory H2 DB). This will load the configuration in application-dev.properties, which has details to connect to the Oracle Database. 
+
+Ensure you provide the right username and password for the DB connection. And that there is a table, based on the Java model, present in the DB. Refer to the end of this file for the DB schema.
+
+Start the spring application by entering the root directory (/springboot-oracle) and running the following command:
 ```
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
 The API is running on http://localhost:8080/data-app/individuals
 
-Setting up Oracle DB using Docker image
+Installing Oracle Database 23c for free using Docker image
 ----------------
+The Oracle Database 23c Free server Container image contains a default database in a multi-tenant configuration with one pluggable database.
+Pull the free container image straight from Oracle’s Container Registry using this command -
+```docker pull container-registry.oracle.com/database/free:latest```
 
-1. Clone `https://github.com/oracle/docker-images`.
-1. Download the Oracle Database 19c binary `LINUX.X64_193000_db_home.zip` from http://www.oracle.com/technetwork/database/enterprise-edition/downloads/index.html
-1. Put the zip in the `OracleDatabase/SingleInstance/dockerfiles/19.3.0` directory. **Do not unzip it.**
-1. In Docker Desktop, ensure you have a large enough amount of memory allocated. These instructions will set the total memory to 4000MB, so make sure Docker has a value higher than that. Remove unwanted or unused images. User `docker image prune` to remove old unused images.
-
-Building
+Using this Image
 --------
-
+To start an Oracle Database server instance, run the following command. 
+In the command below, 'oracle23c' is the name of the container that I have used:
 
 ````
-cd OracleDatabase/SingleInstance/dockerfiles
-./buildContainerImage.sh -v 19.3.0 -e
+docker run --name oracle23c -p 1521:1521 -e ORACLE_PWD=password -d container-registry.oracle.com/database/free:latest
 ````
+The start-up time should be fairly quick. The Oracle Database server is ready to use when the STATUS field shows (healthy) in the docker ps output.
+The above command should have created a default Pluggable Database (PDB) within the FREE Database. 
 
-Running the docker image
--------
-
-To use the sensible defaults:
-
-```
-docker run \
---name oracle19c \
--p 1521:1521 \
--p 5500:5500 \
--e ORACLE_PDB=orcl \
--e ORACLE_PWD=password \
--e INIT_SGA_SIZE=3000 \
--e INIT_PGA_SIZE=1000 \
--v /opt/oracle/oradata \
--d \
-oracle/database:19.3.0-ee
-
-```
-On first run, the database will be created and setup for you. This will take about 10-15 minutes. Open Docker Dashboard and watch the progress. Then you can connect.
+The pluggable database is named 'FREEPDB1'. This is important to note down as this will be part of your connection string in the Spring Boot application.
 
 Executing shell commands on this container
 -------
 
 First get hold of the docker container id by running the following command
 ```
-docker ps | grep oracle19c
+docker ps | grep oracle23c
 ```
 Then execute the following commands (using the container id from the above command) to enter the shell and to connect to the Database.
 ```
 docker exec -it <container id> /bin/bash
-bash-4.2$ sqlplus sys/password@//localhost:1521/orcl as sysdba
+```
+This command is using the `docker exec` command to run an interactive terminal session (`-it`) inside a Docker container. Once executed, it opens a bash shell (`/bin/bash`) within the specified container, allowing you to interact with it directly as if you were working within the container's environment.
+
+Once you are in the bash shell, then run the following command.
+
+```
+sqlplus sys/password@//localhost:1521/FREEPDB1 as sysdba
 ```
 
-You should now be connected to the Oracle Database. You can now create a user using the following command. This is the username and password that you configure in your Springboot app (in the application.properties file).
+You should now be connected to the Oracle Database. You can now create a user using the following command. This is the username and password that you configure in your Spring Boot application.
 
 ```
-SQL> CREATE USER SPRINGORCL IDENTIFIED BY springorclpwd;
+CREATE USER SPRINGORCL IDENTIFIED BY springorclpwd;
 ```
-After the user is created, grant privelages to it using the following command
+After the user is created, grant privileges to it using the following command
 
 ```
 GRANT CONNECT, RESOURCE, DBA TO SPRINGORCL;
 ```
-And then connect to the Database using the user with the following command.
+And then connect to the Database using the user with the following command. You could be prompted for the password. In that case, provide the password that was created in the above step (which is ```springorclpwd```).
 
 ```
-SQL> CONNECT SPRINGORCL@orcl;
+SQL> CONNECT SPRINGORCL@FREEPDB1;
 ```
-Create the table that your Springboot app needs to connect to.
+Create the table that your Spring Boot application needs to connect to.
 
 ```
 CREATE TABLE Person (
@@ -93,3 +93,8 @@ CREATE TABLE Person (
    CONSTRAINT pk_person PRIMARY KEY (id)
 );
 ```
+Once the above steps are completed, run the Spring Boot application.
+
+The application contains a data.sql file in the resources folder which will insert some sample data during application start up.
+
+The API will run on http://localhost:8080/data-app/individuals
