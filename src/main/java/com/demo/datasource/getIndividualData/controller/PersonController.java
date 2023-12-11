@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/data-app")
 public class PersonController {
 
-    private PersonService personService;
+    private final PersonService personService;
 
     @Autowired
     public PersonController(PersonService personService) {
@@ -31,7 +31,7 @@ public class PersonController {
         return personService.getIndividual(id).orElseThrow(() -> new RuntimeException());
     }
 
-    @PostMapping("/individuals/individual")
+    @PostMapping("/individuals")
     public ResponseEntity<?> addIndividual(@Valid @RequestBody Person person){
         personService.addPerson(person);
         return new ResponseEntity<>(HttpStatus.CREATED);
